@@ -1,4 +1,7 @@
 import pandas as pd
+from bokeh.io import show
+from bokeh.models import Column
+from bokeh.plotting import figure
 from random import shuffle
 
 from functools import partial
@@ -69,7 +72,6 @@ def load_noise_times_and_fluxes_path(path):
     fluxes = measured_relative_fluxes / microlensing_signal_fluxes
     return times, fluxes
 
-x = 5
 
 def load_microlensing_times_and_fluxes_path2(path):
     data_frame = pd.read_csv(path, comment='#', delimiter='\s+')
@@ -135,4 +137,15 @@ def get_validation_dataset():
 
 
 if __name__ == '__main__':
-    pass
+    figures = []
+    class_paths = get_paths()
+    for index in range(10):
+        times, magnitudes = load_microlensing_times_and_fluxes_path(class_paths[index])
+        light_curve_figure = figure(x_axis_label='BJD', y_axis_label='Magnification')
+        light_curve_figure.scatter(x=times, y=magnitudes)
+        light_curve_figure.line(x=times, y=magnitudes, line_alpha=0.3)
+        light_curve_figure.sizing_mode = 'stretch_width'
+        figures.append(light_curve_figure)
+    column = Column(*figures)
+    column.sizing_mode = 'stretch_width'
+    show(column)
